@@ -1,0 +1,30 @@
+services:
+  graphiti:
+    image: graphiti-mcp-local:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.local
+      args:
+        GRAPHITI_CORE_VERSION: "0.31.2"
+    container_name: graphiti-mcp
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      - FALKORDB_URI=redis://localhost:6379
+      - FALKORDB_DATABASE=default_db
+      - GRAPHITI_GROUP_ID=main
+      - LLM_PROVIDER=openai
+      - MODEL_NAME=deepseek/deepseek-v4.1-flash
+      - RERANKER_MODEL=typesafe/jev-1.13
+      - RERANK_SEARCH=1
+      - CONFIG_PATH=/app/mcp/config/config.yaml
+      - BROWSER=1
+    volumes:
+      - ../config/config-local.yaml:/app/mcp/config/config.yaml:ro
+      - falkordb_data:/var/lib/falkordb/data
+    ports:
+      - "127.0.0.1:6380:6379"
+      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:8000:8000"
+volumes:
+  falkordb_data:
